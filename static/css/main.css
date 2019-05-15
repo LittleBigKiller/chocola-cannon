@@ -1,0 +1,70 @@
+* {
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    -moz-user-select: none;
+    user-select: none;
+    font-family: monospace;
+}
+
+button, select {
+    background-color: #33333388;
+    color: #dddddd;
+    border: 2px solid #dddddd;
+    margin-bottom: 2px;
+    padding: 5px;
+    text-transform: uppercase;
+}
+
+button:hover {
+    color: #dd8833;
+    border-color: #dd8833;
+}
+
+button:active {
+    color: #88dd33;
+    border-color: #88dd33;
+}
+
+#root {
+    width: 100vw;
+    height: 100vh;
+    background-color: #DD3388;
+}
+
+#overlay {
+    /* display: none; */
+    z-index: 69;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#overlay * {
+    pointer-events: all;
+}
+
+#await-dialog-spinner {
+    display: block;
+    margin: 50px 0;
+    width: 150px;
+    height: 150px;
+    animation-name: await-dialog-spinner;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes await-dialog-spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(180deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

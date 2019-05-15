@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>[Chocola] Cannon</title>
+
+    <link rel="stylesheet" type="text/css" href="/css/main.css"/>
+
+    <script src="/libs/jquery331.js"></script>
+    <script src="/libs/three.js"></script>
+    <script src="/libs/grid.js"></script>
+    <script src="/libs/OrbitControls.js"></script>
+
+    <script src="/js/Ball.js"></script>
+    <script src="/js/Cannon.js"></script>
+    <script src="/js/Main.js"></script>
+
+    <script>
+        let chocola
+        $(document).ready(() => {
+            chocola = new Main()
+        })
+    </script>
+</head>
+
+<body>
+    <div id="overlay">
+        <input type="range" min="0" max="90" step="1" value="45" oninput="chocola.cannonAngle(this.value)">
+    </div>
+    <div id="root"></div>
+</body>
+
+</html>
