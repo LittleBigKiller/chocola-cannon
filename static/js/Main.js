@@ -4,7 +4,7 @@ class Main {
     constructor() {
         this.gravConst = 9.81
         this.gravMulti = 1
-        this.shotPower = 500
+        this.shotPower = 50
         this.ballInFlight = false
         this.flightTime = 0
         this.barrelAngle = 45
@@ -89,14 +89,17 @@ class Main {
             let originPos = new THREE.Vector3()
             this.canObj.tip.getWorldPosition(originPos)
 
+            this.cannonDir = new THREE.Vector3(1, 1, 1)
+            this.canObj.cont.getWorldDirection(this.cannonDir)
+
             let radAngle = this.barrelAngle * (Math.PI / 180)
 
             let scaledTime = this.flightTime
             let scaledGrav = this.gravConst * this.gravMulti
 
-            let x = 0
+            let x = this.shotPower * scaledTime * Math.cos(radAngle) * this.cannonDir.x
             let y = this.shotPower * scaledTime * Math.sin(radAngle) - ((scaledGrav * scaledTime * scaledTime) / 2)
-            let z = this.shotPower * scaledTime * Math.cos(radAngle)
+            let z = this.shotPower * scaledTime * Math.cos(radAngle) * this.cannonDir.z
 
             let newBallPos = new THREE.Vector3(x, y, z)
             newBallPos.add(originPos)
@@ -109,7 +112,7 @@ class Main {
                 setTimeout(() => {
                     this.ballInFlight = false
                     this.prepareShot()
-                }, 2000)
+                }, 500)
             }
         }
     }
@@ -150,8 +153,6 @@ class Main {
         if (!this.ballInFlight) {
             this.ballInFlight = true
             this.shotDate = Date.now()
-            this.cannonDir = new THREE.Vector3(1, 1, 1)
-            this.canObj.cont.getWorldDirection(this.cannonDir)
         }
     }
 }
