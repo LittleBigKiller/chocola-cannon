@@ -2,13 +2,17 @@ console.log('Main loaded')
 
 class Main {
     constructor() {
-        this.Cannon = new Cannon()
-        this.Ball = new Ball()
+        this.gravConst = 9.81
+        this.gravMulti = 1
+        this.shotPower = 500
+        this.ballInFlight = false
+        this.flightTime = 0
+        this.barrelAngle = 45
 
-        this.draw()
-    }
+        this.shotParams = {}
 
-    draw() {
+        this.gameClock = new THREE.Clock()
+
         var scene = new THREE.Scene()
         this.scene = scene
 
@@ -45,18 +49,23 @@ class Main {
         let axes = new THREE.AxesHelper(2000)
         scene.add(axes)
 
-        let grid = new Grid(2000, 200)
+        let grid = new Grid(20000, 2000)
         scene.add(grid)
 
         this.canObj = new Cannon()
-        let cannon = this.canObj.getCannon()
+        let cannon = this.canObj.cont
         scene.add(cannon)
 
         this.ballObj = new Ball()
-        let ball = this.ballObj.getBall()
+        let ball = this.ballObj.ball
         scene.add(ball)
 
+        this.cannonAngle(45)
+
+        let main = this
+
         function render() {
+            main.ballistics()
             requestAnimationFrame(render)
 
             renderer.render(scene, camera)
@@ -73,11 +82,76 @@ class Main {
         render()
     }
 
+    ballistics() {
+        if (this.ballInFlight) {
+            this.flightTime = (Date.now() - this.shotDate) / 500
+
+            let originPos = new THREE.Vector3()
+            this.canObj.tip.getWorldPosition(originPos)
+
+            let radAngle = this.barrelAngle * (Math.PI / 180)
+
+            let scaledTime = this.flightTime
+            let scaledGrav = this.gravConst * this.gravMulti
+
+            let x = 0
+            let y = this.shotPower * scaledTime * Math.sin(radAngle) - ((scaledGrav * scaledTime * scaledTime) / 2)
+            let z = this.shotPower * scaledTime * Math.cos(radAngle)
+
+            let newBallPos = new THREE.Vector3(x, y, z)
+            newBallPos.add(originPos)
+
+            this.ballObj.ball.position.x = newBallPos.x
+            this.ballObj.ball.position.y = newBallPos.y
+            this.ballObj.ball.position.z = newBallPos.z
+
+            if (this.ballObj.ball.position.y <= 0) {
+                setTimeout(() => {
+                    this.ballInFlight = false
+                    this.prepareShot()
+                }, 2000)
+            }
+        }
+    }
+
+    prepareShot() {
+        if (!this.ballInFlight) {
+            this.scene.updateMatrixWorld()
+            let newBallPos = new THREE.Vector3(0, 0, 0)
+            this.canObj.tip.getWorldPosition(newBallPos)
+            this.ballObj.ball.position.set(newBallPos.x, newBallPos.y, newBallPos.z)
+        } else {
+            console.warn('prepareShort() aborted, shot in progress')
+        }
+    }
+
     cannonAngle(value) {
-        this.canObj.setAngle(Math.abs(value - 90))
-        let newBallPos = this.canObj.tip.getWorldPosition()
-        console.log(newBallPos)
-        this.ballObj.getBall().position.set(newBallPos.x, newBallPos.y, newBallPos.z)
-        console.log(this.ballObj.getBall().position)
+        this.barrelAngle = value
+        this.canObj.setBarrelAngle(Math.abs(value - 90))
+
+        this.prepareShot()
+    }
+
+    cannonRotate(value) {
+        this.canObj.setRotation(value)
+
+        this.prepareShot()
+    }
+
+    cannonPower(value) {
+        this.shotPower = value
+    }
+
+    setGravMulti(value) {
+        this.gravMulti = value
+    }
+
+    cannonFire() {
+        if (!this.ballInFlight) {
+            this.ballInFlight = true
+            this.shotDate = Date.now()
+            this.cannonDir = new THREE.Vector3(1, 1, 1)
+            this.canObj.cont.getWorldDirection(this.cannonDir)
+        }
     }
 }

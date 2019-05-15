@@ -7,29 +7,10 @@
     font-family: monospace;
 }
 
-button, select {
-    background-color: #33333388;
-    color: #dddddd;
-    border: 2px solid #dddddd;
-    margin-bottom: 2px;
-    padding: 5px;
-    text-transform: uppercase;
-}
-
-button:hover {
-    color: #dd8833;
-    border-color: #dd8833;
-}
-
-button:active {
-    color: #88dd33;
-    border-color: #88dd33;
-}
-
 #root {
     width: 100vw;
     height: 100vh;
-    background-color: #DD3388;
+    background-color: #DD2F7F;
 }
 
 #overlay {
@@ -45,6 +26,50 @@ button:active {
 
 #overlay * {
     pointer-events: all;
+}
+
+.range-box {
+    box-sizing: border-box;
+    width: 220px;
+    height: 50px;
+    margin: 5px;
+    padding: 5px;
+    background-color: #7F7F7F;
+    border: 2px solid #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+}
+
+#button-fire {
+    width: 220px;
+    height: 50px;
+    font-size: 2em;
+    margin: 5px 5px;
+    background-color: #2F2F2F;
+    color: #CFCFCF;
+    border: 2px solid #CFCFCF;
+    padding: 5px;
+    text-transform: uppercase;
+}
+
+#button-fire:hover {
+    color: #CF7F2F;
+    border-color: #CF7F2F;
+    background-color: #3F3F3F;
+}
+
+#button-fire:active {
+    color: #CF2F2F;
+    border-color: #CF2F2F;
+    background-color: #1F1F1F;
+}
+
+#button-fire:disabled {
+    background-color: #3F3F3F;
+    color: #7F7F7F;
+    border: 2px solid #7F7F7F;
 }
 
 #await-dialog-spinner {

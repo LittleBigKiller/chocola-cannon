@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>[Chocola] Cannon</title>
 
-    <link rel="stylesheet" type="text/css" href="/css/main.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
 
     <script src="/libs/jquery331.js"></script>
     <script src="/libs/three.js"></script>
@@ -28,7 +28,27 @@
 
 <body>
     <div id="overlay">
-        <input type="range" min="0" max="90" step="1" value="45" oninput="chocola.cannonAngle(this.value)">
+        <div class="range-box">
+            <label id="lbl-barrel">Barrel angle: 45</label>
+            <input type="range" min="0" max="90" step="1" value="45"
+                oninput="chocola.cannonAngle(this.value); document.getElementById('lbl-barrel').innerHTML = 'Barrel angle: ' + this.value">
+        </div>
+        <div class="range-box">
+            <label id="lbl-rotat">Cannon Rotation: 0</label>
+            <input type="range" min="0" max="360" step="1" value="0"
+                oninput="chocola.cannonRotate(this.value); document.getElementById('lbl-rotat').innerHTML = 'Cannon Rotation: ' + this.value">
+        </div>
+        <div class="range-box">
+            <label id="lbl-power">Power: 500</label>
+            <input type="range" min="100" max="1000" step="100" value="500"
+                oninput="chocola.cannonPower(this.value); document.getElementById('lbl-power').innerHTML = 'Power: ' + this.value">
+        </div>
+        <div class="range-box">
+            <label id="lbl-grav">Gravity Multiplier: 1</label>
+            <input type="range" min="0.1" max="4" step="0.1" value="1"
+                oninput="chocola.setGravMulti(this.value); document.getElementById('lbl-grav').innerHTML = 'Gravity Multiplier: ' + this.value">
+        </div>
+        <button id="button-fire" type="button" onclick="chocola.cannonFire()">FIRE!</button>
     </div>
     <div id="root"></div>
 </body>

@@ -3,18 +3,19 @@ console.log('Cannon loaded')
 class Cannon {
     constructor() {
         this.cont = new THREE.Object3D()
-        this.init()
-    }
-
-    init() {
-        let wheelGeo = new THREE.CylinderGeometry(20, 20, 10, 32)
+        this.barrelAngle = 45
+        this.cannonAngle = 0
+        
+        let wheelGeo = new THREE.CylinderGeometry(20, 20, 10, 8)
         let wheelMat = new THREE.MeshBasicMaterial({
-            color: 0xCF7F2F
+            color: 0xCF7F2F,
+            wireframe: true
         })
 
-        let barrelGeo = new THREE.CylinderGeometry(10, 10, 50, 32)
+        let barrelGeo = new THREE.CylinderGeometry(10, 10, 50, 8)
         let barrelMat = new THREE.MeshBasicMaterial({
-            color: 0x7F7F7F
+            color: 0x7F7F7F,
+            wireframe: true
         })
 
         let wheelLeft = new THREE.Mesh(wheelGeo, wheelMat)
@@ -38,16 +39,17 @@ class Cannon {
         this.cont.add(wheelRight)
         this.cont.add(this.barrel)
         this.cont.translateOnAxis(new THREE.Vector3(0, 1, 0), 20)
-
-        this.setAngle(45)
     }
 
-    getCannon() {
-        return this.cont
-    }
-
-    setAngle(angle) {
+    setBarrelAngle(angle) {
+        this.barrelAngle = angle
         let rad = angle * (Math.PI / 180)
         this.barrel.rotation.set(rad, 0, 0)
+    }
+
+    setRotation(angle) {
+        this.cannonAngle = angle
+        let rad = angle * (Math.PI / 180)
+        this.cont.rotation.set(0, rad, 0)
     }
 }
