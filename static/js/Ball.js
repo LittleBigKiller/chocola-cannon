@@ -21,5 +21,20 @@ class Ball {
 
         this.ball.add(frame)
         this.cont.add(this.ball)
+
+        this.isFlying = false
+        this.marked = false
+    }
+
+    shot(time, bAngle, cAngle, power, gMulti, origin, lifetime) {
+        this.shotTime = time
+        this.barrelAngle = bAngle
+        this.cannonAngle = cAngle
+        this.power = power
+        this.gMulti = gMulti
+        this.origin = origin
+        this.lifetime = lifetime
+
+        this.isFlying = true
     }
 }
