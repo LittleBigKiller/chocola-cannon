@@ -64,13 +64,6 @@ class Main {
 
         let main = this
 
-        function render() {
-            main.ballistics()
-            requestAnimationFrame(render)
-
-            renderer.render(scene, camera)
-        }
-
         $(window).resize(function () {
             winWidth = $(window).width()
             winHeight = $(window).height()
@@ -78,6 +71,13 @@ class Main {
             camera.updateProjectionMatrix()
             renderer.setSize(winWidth, winHeight)
         })
+
+        function render() {
+            main.ballistics()
+            requestAnimationFrame(render)
+
+            renderer.render(scene, camera)
+        }
 
         render()
     }
@@ -107,6 +107,13 @@ class Main {
             this.ballObj.ball.position.x = newBallPos.x
             this.ballObj.ball.position.y = newBallPos.y
             this.ballObj.ball.position.z = newBallPos.z
+
+            console.log(scaledTime)
+            console.log(originPos)
+            console.log(this.cannonDir)
+            console.log(radAngle)
+            console.log(scaledGrav)
+            console.log(newBallPos)
 
             if (this.ballObj.ball.position.y <= 0) {
                 setTimeout(() => {
