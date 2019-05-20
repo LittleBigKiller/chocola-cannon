@@ -64,13 +64,6 @@ class Main {
 
         let main = this
 
-        function render() {
-            main.ballistics()
-            requestAnimationFrame(render)
-
-            renderer.render(scene, camera)
-        }
-
         $(window).resize(function () {
             winWidth = $(window).width()
             winHeight = $(window).height()
@@ -78,6 +71,13 @@ class Main {
             camera.updateProjectionMatrix()
             renderer.setSize(winWidth, winHeight)
         })
+
+        function render() {
+            main.ballistics()
+            requestAnimationFrame(render)
+
+            renderer.render(scene, camera)
+        }
 
         render()
     }
