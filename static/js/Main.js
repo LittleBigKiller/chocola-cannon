@@ -4,7 +4,6 @@ class Main {
     constructor() {
         this.gravConst = 9.81
 
-        this.ballInFlight = false
         this.balls = []
         this.empty = true
 
@@ -121,13 +120,11 @@ class Main {
     }
 
     prepareShot() {
-        if (!this.ballInFlight) {
+        if (this.balls.length != 0) {
             this.scene.updateMatrixWorld()
             let newBallPos = new THREE.Vector3(0, 0, 0)
             this.canObj.tip.getWorldPosition(newBallPos)
             this.balls[this.balls.length - 1].ball.position.set(newBallPos.x, newBallPos.y, newBallPos.z)
-        } else {
-            console.warn('prepareShort() aborted, shot in progress')
         }
     }
 
