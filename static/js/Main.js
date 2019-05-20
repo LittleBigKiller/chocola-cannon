@@ -6,6 +6,7 @@ class Main {
 
         this.ballInFlight = false
         this.balls = []
+        this.empty = true
 
         var scene = new THREE.Scene()
         this.scene = scene
@@ -68,6 +69,7 @@ class Main {
         this.cannonRotate($('#rng-rotat').val())
         this.cannonPower($('#rng-power').val())
         this.setGravMulti($('#rng-grav').val())
+        this.setBallTime($('#rng-btime').val())
 
         function render() {
             main.ballistics()
@@ -83,7 +85,6 @@ class Main {
         for (let i in this.balls) {
             let ball = this.balls[i]
             if (ball.isFlying) {
-                console.log('counting')
                 let flightTime = (Date.now() - ball.shotTime) / 500
 
                 let originPos = ball.origin
@@ -92,9 +93,9 @@ class Main {
 
                 let scaledGrav = this.gravConst * ball.gMulti
 
-                let x = ball.shotPower * flightTime * Math.cos(radAngle) * cannonDir.x
-                let y = ball.shotPower * flightTime * Math.sin(radAngle) - ((scaledGrav * flightTime * flightTime) / 2)
-                let z = ball.shotPower * flightTime * Math.cos(radAngle) * cannonDir.z
+                let x = ball.power * flightTime * Math.cos(radAngle) * cannonDir.x
+                let y = ball.power * flightTime * Math.sin(radAngle) - ((scaledGrav * flightTime * flightTime) / 2)
+                let z = ball.power * flightTime * Math.cos(radAngle) * cannonDir.z
 
                 let newBallPos = new THREE.Vector3(x, y, z)
                 newBallPos.add(originPos)
@@ -103,54 +104,20 @@ class Main {
                 ball.ball.position.y = newBallPos.y
                 ball.ball.position.z = newBallPos.z
 
-                console.log(flightTime)
-                console.log(originPos)
-                console.log(cannonDir)
-                console.log(radAngle)
-                console.log(scaledGrav)
-                console.log(newBallPos)
-
                 if (ball.ball.position.y < 0) {
                     ball.ball.position.y = 0
-                    setTimeout(() => {
-                        this.balls.splice(this.balls.indexOf(ball), 1)
-                    }, 500)
+
+                    if (!ball.marked) {
+                        ball.marked = true
+                        console.warn('-- TRIGGER HIT EFFECT HERE --')
+                        setTimeout(() => {
+                            this.balls.splice(this.balls.indexOf(ball), 1)
+                            this.scene.remove(ball.ball)
+                        }, ball.lifetime)
+                    }
                 }
             }
         }
-
-        /* if (this.ballInFlight) {
-            this.flightTime = (Date.now() - this.shotDate) / 500
-
-            let originPos = new THREE.Vector3(1, 1, 1)
-            this.canObj.tip.getWorldPosition(originPos)
-
-            this.cannonDir = new THREE.Vector3(1, 1, 1)
-            this.canObj.cont.getWorldDirection(this.cannonDir)
-
-            let radAngle = this.barrelAngle * (Math.PI / 180)
-
-            let scaledTime = this.flightTime
-            let scaledGrav = this.gravConst * this.gravMulti
-
-            let x = this.shotPower * scaledTime * Math.cos(radAngle) * this.cannonDir.x
-            let y = this.shotPower * scaledTime * Math.sin(radAngle) - ((scaledGrav * scaledTime * scaledTime) / 2)
-            let z = this.shotPower * scaledTime * Math.cos(radAngle) * this.cannonDir.z
-
-            let newBallPos = new THREE.Vector3(x, y, z)
-            newBallPos.add(originPos)
-
-            this.ballObj.ball.position.x = newBallPos.x
-            this.ballObj.ball.position.y = newBallPos.y
-            this.ballObj.ball.position.z = newBallPos.z
-
-            if (this.ballObj.ball.position.y <= 0) {
-                setTimeout(() => {
-                    this.ballInFlight = false
-                    this.prepareShot()
-                }, 500)
-            }
-        } */
     }
 
     prepareShot() {
@@ -193,12 +160,22 @@ class Main {
         $('#lbl-grav').html('Gravity Multiplier: ' + value)
     }
 
+    setBallTime(value) {
+        this.ballTime = value
+
+        $('#lbl-btime').html('Ball Time: ' + value)
+    }
+
     cannonFire() {
-        /* if (!this.ballInFlight) {
-            this.ballInFlight = true
-            this.shotDate = Date.now()
-        } */
-        this.balls[this.balls.length - 1].shot(Date.now(), this.barrelAngle, this.canObj.cont.getWorldDirection(new THREE.Vector3(1, 1, 1)), this.shotPower, this.gravMulti, this.canObj.tip.getWorldPosition(new THREE.Vector3(1, 1, 1)))
+        if (this.empty) {
+            this.reloadCannon()
+            $('#button-fire').html('FIRE!').removeClass('reload')
+        } else {
+            this.balls[this.balls.length - 1].shot(Date.now(), this.barrelAngle, this.canObj.cont.getWorldDirection(new THREE.Vector3(1, 1, 1)), this.shotPower, this.gravMulti, this.canObj.tip.getWorldPosition(new THREE.Vector3(1, 1, 1)), this.ballTime)
+            $('#button-fire').html('RELOAD!').addClass('reload')
+            this.empty = true
+            console.warn('-- TRIGGER FIRE EFFECT HERE --')
+        }
     }
 
     reloadCannon() {
@@ -212,6 +189,9 @@ class Main {
             this.balls.push(ballObj)
             let ball = ballObj.ball
             this.scene.add(ball)
+
+            this.prepareShot()
+            this.empty = false
         }
     }
 }

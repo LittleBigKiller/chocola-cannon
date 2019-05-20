@@ -47,7 +47,7 @@
     height: 50px;
     font-size: 2em;
     margin: 5px 5px;
-    background-color: #2F2F2F;
+    background-color: #3F3F3F;
     color: #CFCFCF;
     border: 2px solid #CFCFCF;
     padding: 5px;
@@ -63,13 +63,19 @@
 #button-fire:active {
     color: #CF2F2F;
     border-color: #CF2F2F;
-    background-color: #1F1F1F;
+    background-color: #2F2F2F;
 }
 
 #button-fire:disabled {
     background-color: #3F3F3F;
     color: #7F7F7F;
     border: 2px solid #7F7F7F;
+}
+
+#button-fire.reload {
+    color: #1F1F1F;
+    border-color: #1F1F1F;
+    background-color: #CF2F2F;
 }
 
 #await-dialog-spinner {
