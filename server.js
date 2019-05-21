@@ -148,9 +148,31 @@ io.sockets.on('connection', function (client) {
         console.log(connectedClients)
     })
 
-    client.on('shot', function () {
+    client.on('shot', function (data) {
         console.log(client.id + ': shot')
-        client.broadcast.emit('shot')
+        client.broadcast.emit('shot', {
+            time: data.time,
+            bAngle: data.bAngle,
+            cAngle: data.cAngle,
+            power: data.power,
+            gMulti: data.gMulti,
+            origin: data.origin,
+            lifetime: data.lifetime
+        })
+    })
+
+    client.on('bAngle', function (data) {
+        console.log(client.id + ': bAngle')
+        client.broadcast.emit('bAngle', {
+            bAngle: data.bAngle,
+        })
+    })
+
+    client.on('cAngle', function (data) {
+        console.log(client.id + ': cAngle')
+        client.broadcast.emit('cAngle', {
+            cAngle: data.cAngle,
+        })
     })
 
     client.on('reload', function () {

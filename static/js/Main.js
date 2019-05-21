@@ -31,8 +31,6 @@ class Main {
             renderer.render(scene, camera)
         })
 
-
-
         $("#root").append(renderer.domElement)
 
         this.camera.position.set(500, 500, -500)
@@ -48,14 +46,6 @@ class Main {
         let grid = new Grid(20000, 2000)
         scene.add(grid)
 
-        this.canObj = new Cannon(0xCF2F2F)
-        let cannon = this.canObj.cont
-        scene.add(cannon)
-
-        this.reloadCannon()
-
-        this.cannonAngle(45)
-
         let main = this
 
         $(window).resize(function () {
@@ -66,12 +56,6 @@ class Main {
             renderer.setSize(winWidth, winHeight)
         })
 
-        this.cannonAngle($('#rng-barrel').val())
-        this.cannonRotate($('#rng-rotat').val())
-        this.cannonPower($('#rng-power').val())
-        this.setGravMulti($('#rng-grav').val())
-        this.setBallTime($('#rng-btime').val())
-
         function render() {
             main.ballistics()
             requestAnimationFrame(render)
@@ -80,6 +64,31 @@ class Main {
         }
 
         render()
+    }
+
+    spawnCannons(slot) {
+        this.canObj = new Cannon(slot)
+        let cannon = this.canObj.cont
+        this.scene.add(cannon)
+        
+        this.reloadCannon()
+        this.cannonAngle($('#rng-barrel').val())
+        this.cannonRotate($('#rng-rotat').val())
+        this.cannonPower($('#rng-power').val())
+        this.setGravMulti($('#rng-grav').val())
+        this.setBallTime($('#rng-btime').val())
+
+        let othSlot = null
+        if (slot == 'cl1') othSlot = 'cl0'
+        else othSlot = 'cl1'
+
+        this.othCan = new Cannon(othSlot)
+        let cannon1 = this.othCan.cont
+        this.scene.add(cannon1)
+    }
+
+    showOther(boolean) {
+        this.othCan.cont.visible = boolean
     }
 
     ballistics() {
@@ -119,32 +128,73 @@ class Main {
                 }
             }
         }
+
+        for (let i in this.othBalls) {
+            let ball = this.othBalls[i]
+            if (ball.isFlying) {
+                let flightTime = (Date.now() - ball.shotTime) / 500
+
+                let originPos = ball.origin
+                let cannonDir = ball.cannonAngle
+                let radAngle = ball.barrelAngle * (Math.PI / 180)
+
+                let scaledGrav = this.gravConst * ball.gMulti
+
+                let x = ball.power * flightTime * Math.cos(radAngle) * cannonDir.x
+                let y = ball.power * flightTime * Math.sin(radAngle) - ((scaledGrav * flightTime * flightTime) / 2)
+                let z = ball.power * flightTime * Math.cos(radAngle) * cannonDir.z
+
+                let newBallPos = new THREE.Vector3(x, y, z)
+                newBallPos.add(originPos)
+
+                ball.ball.position.x = newBallPos.x
+                ball.ball.position.y = newBallPos.y
+                ball.ball.position.z = newBallPos.z
+
+                if (ball.ball.position.y < 0) {
+                    ball.ball.position.y = 0
+
+                    if (!ball.marked) {
+                        ball.marked = true
+                        console.warn('-- TRIGGER HIT EFFECT HERE --')
+                        setTimeout(() => {
+                            this.balls.splice(this.balls.indexOf(ball), 1)
+                            this.scene.remove(ball.ball)
+                        }, ball.lifetime)
+                    }
+                }
+            }
+        }
     }
 
-    prepareShot() {
+    prepareShot(cannon = this.canObj) {
         if (this.balls.length != 0) {
             this.scene.updateMatrixWorld()
             let newBallPos = new THREE.Vector3(0, 0, 0)
-            this.canObj.tip.getWorldPosition(newBallPos)
+            cannon.tip.getWorldPosition(newBallPos)
             this.balls[this.balls.length - 1].ball.position.set(newBallPos.x, newBallPos.y, newBallPos.z)
         }
     }
 
-    cannonAngle(value) {
+    cannonAngle(value, cannon = this.canObj) {
         this.barrelAngle = value
-        this.canObj.setBarrelAngle(Math.abs(value - 90))
+        cannon.setBarrelAngle(Math.abs(value - 90))
 
         $('#lbl-barrel').html('Barrel angle: ' + value)
 
-        this.prepareShot()
+        this.prepareShot(cannon)
+
+        if (cannon == this.canObj) net.client.emit('bAngle', {bAngle: value})
     }
 
-    cannonRotate(value) {
-        this.canObj.setRotation(value)
+    cannonRotate(value, cannon = this.canObj) {
+        cannon.setRotation(value)
 
         $('#lbl-rotat').html('Cannon Rotation: ' + value)
 
-        this.prepareShot()
+        this.prepareShot(cannon)
+
+        if (cannon == this.canObj) net.client.emit('cAngle', {cAngle: value})
     }
 
     cannonPower(value) {
@@ -176,8 +226,16 @@ class Main {
             $('#button-fire').html('RELOAD!').addClass('reload')
             this.empty = true
             console.warn('-- TRIGGER FIRE EFFECT HERE --')
-            
-            net.client.emit('shot')
+
+            net.client.emit('shot', {
+                time: Date.now(),
+                bAngle: this.barrelAngle,
+                cAngle: this.canObj.cont.getWorldDirection(new THREE.Vector3(1, 1, 1)),
+                power: this.shotPower,
+                gMulti: this.gravMulti,
+                origin: this.canObj.tip.getWorldPosition(new THREE.Vector3(1, 1, 1)),
+                lifetime: this.ballTime
+            })
         }
     }
 

@@ -11,18 +11,34 @@ class Net {
                 console.log('multiple')
             }
             console.log('my slot: ' + data.slot)
+            chocola.spawnCannons(data.slot)
         })
 
         this.client.on('anotherConnected', function () {
             console.log('multiple now')
+            chocola.showOther(true)
         })
 
         this.client.on('alone', function () {
             console.log('solo again')
+            chocola.showOther(false)
         })
 
-        this.client.on('shot', function () {
+        this.client.on('shot', function (data) {
             console.log('net shot')
+            console.log(data)
+        })
+
+        this.client.on('bAngle', function (data) {
+            console.log('net bAngle')
+            console.log(data)
+            chocola.cannonAngle(data.bAngle, chocola.othCan)
+        })
+
+        this.client.on('cAngle', function (data) {
+            console.log('net cAngle')
+            console.log(data)
+            chocola.cannonRotate(data.cAngle, chocola.othCan)
         })
 
         this.client.on('reload', function () {

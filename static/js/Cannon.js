@@ -1,7 +1,17 @@
 console.log('Cannon loaded')
 
 class Cannon {
-    constructor(color) {
+    constructor(slot) {
+        let color
+        let position
+        if (slot == 'cl0') {
+            color = 0xFF0000
+            position = new THREE.Vector3(-100, 0, 0)
+        } else {
+            color = 0x00FF00
+            position = new THREE.Vector3(100, 0, 0)
+        }
+
         this.cont = new THREE.Object3D()
         this.barrelAngle = 45
         this.cannonAngle = 0
@@ -51,6 +61,7 @@ class Cannon {
         this.cont.add(this.wheelLeft)
         this.cont.add(this.wheelRight)
         this.cont.add(this.barrel)
+        this.cont.position.set(position.x, position.y, position.z)
         this.cont.translateOnAxis(new THREE.Vector3(0, 1, 0), 20)
     }
 
