@@ -7,7 +7,8 @@ class Main {
         this.balls = []
         this.empty = true
 
-        this.netBalls = []
+        this.othBalls = []
+        this.othEmpty = true
 
         var scene = new THREE.Scene()
         this.scene = scene
@@ -70,7 +71,7 @@ class Main {
         this.canObj = new Cannon(slot)
         let cannon = this.canObj.cont
         this.scene.add(cannon)
-        
+
         this.reloadCannon()
         this.cannonAngle($('#rng-barrel').val())
         this.cannonRotate($('#rng-rotat').val())
@@ -89,6 +90,10 @@ class Main {
 
     showOther(boolean) {
         this.othCan.cont.visible = boolean
+
+        for (let i in this.othBalls) {
+            this.othBalls[i].cont.visible = boolean
+        }
     }
 
     ballistics() {
@@ -122,7 +127,7 @@ class Main {
                         console.warn('-- TRIGGER HIT EFFECT HERE --')
                         setTimeout(() => {
                             this.balls.splice(this.balls.indexOf(ball), 1)
-                            this.scene.remove(ball.ball)
+                            this.scene.remove(ball.cont)
                         }, ball.lifetime)
                     }
                 }
@@ -158,8 +163,8 @@ class Main {
                         ball.marked = true
                         console.warn('-- TRIGGER HIT EFFECT HERE --')
                         setTimeout(() => {
-                            this.balls.splice(this.balls.indexOf(ball), 1)
-                            this.scene.remove(ball.ball)
+                            this.othBalls.splice(this.othBalls.indexOf(ball), 1)
+                            this.scene.remove(ball.cont)
                         }, ball.lifetime)
                     }
                 }
@@ -168,11 +173,14 @@ class Main {
     }
 
     prepareShot(cannon = this.canObj) {
-        if (this.balls.length != 0) {
+        let balls = this.balls
+        if (cannon != this.canObj) balls = this.othBalls
+
+        if (balls.length != 0) {
             this.scene.updateMatrixWorld()
             let newBallPos = new THREE.Vector3(0, 0, 0)
             cannon.tip.getWorldPosition(newBallPos)
-            this.balls[this.balls.length - 1].ball.position.set(newBallPos.x, newBallPos.y, newBallPos.z)
+            balls[balls.length - 1].ball.position.set(newBallPos.x, newBallPos.y, newBallPos.z)
         }
     }
 
@@ -180,21 +188,23 @@ class Main {
         this.barrelAngle = value
         cannon.setBarrelAngle(Math.abs(value - 90))
 
-        $('#lbl-barrel').html('Barrel angle: ' + value)
-
         this.prepareShot(cannon)
 
-        if (cannon == this.canObj) net.client.emit('bAngle', {bAngle: value})
+        if (cannon == this.canObj) {
+            $('#lbl-barrel').html('Barrel angle: ' + value)
+            net.client.emit('bAngle', { bAngle: value })
+        }
     }
 
     cannonRotate(value, cannon = this.canObj) {
         cannon.setRotation(value)
 
-        $('#lbl-rotat').html('Cannon Rotation: ' + value)
-
         this.prepareShot(cannon)
 
-        if (cannon == this.canObj) net.client.emit('cAngle', {cAngle: value})
+        if (cannon == this.canObj) {
+            $('#lbl-rotat').html('Cannon Rotation: ' + value)
+            net.client.emit('cAngle', { cAngle: value })
+        }
     }
 
     cannonPower(value) {
@@ -239,20 +249,32 @@ class Main {
         }
     }
 
-    reloadCannon() {
+    cannonNetFire(data) {
+        this.othBalls[this.othBalls.length - 1].shot(data.time, data.bAngle, data.cAngle, data.power, data.gMulti, data.origin, data.lifetime)
+        this.othEmpty = true
+        console.warn('-- TRIGGER FIRE EFFECT HERE --')
+    }
+
+    reloadCannon(cannon = this.canObj) {
+        let balls = this.balls
+        if (cannon != this.canObj) balls = this.othBalls
+
         let empty = true
-        for (let i in this.balls) {
-            if (!this.balls[i].isFlying) empty = false
+        for (let i in balls) {
+            if (!balls[i].isFlying) empty = false
         }
 
         if (empty) {
             let ballObj = new Ball()
-            this.balls.push(ballObj)
-            let ball = ballObj.ball
+            balls.push(ballObj)
+            let ball = ballObj.cont
             this.scene.add(ball)
 
-            this.prepareShot()
-            this.empty = false
+            this.prepareShot(cannon)
+            if (cannon == this.canObj)
+                this.empty = false
+            else
+                this.othEmpty = false
         }
     }
 }
