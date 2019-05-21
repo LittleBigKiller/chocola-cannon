@@ -7,6 +7,8 @@ class Main {
         this.balls = []
         this.empty = true
 
+        this.netBalls = []
+
         var scene = new THREE.Scene()
         this.scene = scene
 
@@ -46,7 +48,7 @@ class Main {
         let grid = new Grid(20000, 2000)
         scene.add(grid)
 
-        this.canObj = new Cannon()
+        this.canObj = new Cannon(0xCF2F2F)
         let cannon = this.canObj.cont
         scene.add(cannon)
 
@@ -167,11 +169,15 @@ class Main {
         if (this.empty) {
             this.reloadCannon()
             $('#button-fire').html('FIRE!').removeClass('reload')
+
+            net.client.emit('reload')
         } else {
             this.balls[this.balls.length - 1].shot(Date.now(), this.barrelAngle, this.canObj.cont.getWorldDirection(new THREE.Vector3(1, 1, 1)), this.shotPower, this.gravMulti, this.canObj.tip.getWorldPosition(new THREE.Vector3(1, 1, 1)), this.ballTime)
             $('#button-fire').html('RELOAD!').addClass('reload')
             this.empty = true
             console.warn('-- TRIGGER FIRE EFFECT HERE --')
+            
+            net.client.emit('shot')
         }
     }
 

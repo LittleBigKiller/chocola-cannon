@@ -1,14 +1,14 @@
 console.log('Cannon loaded')
 
 class Cannon {
-    constructor() {
+    constructor(color) {
         this.cont = new THREE.Object3D()
         this.barrelAngle = 45
         this.cannonAngle = 0
 
         let wheelGeo = new THREE.CylinderGeometry(20, 20, 10, 16)
         let wheelMat = new THREE.MeshBasicMaterial({
-            color: 0xCF7F2F,
+            color: color,
             wireframe: false
         })
 
@@ -19,7 +19,7 @@ class Cannon {
 
         let barrelGeo = new THREE.CylinderGeometry(10, 10, 50, 16)
         let barrelMat = new THREE.MeshBasicMaterial({
-            color: 0x7F7F7F,
+            color: color,
             wireframe: false
         })
 

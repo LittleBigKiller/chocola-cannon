@@ -14,13 +14,18 @@
     <script src="/libs/grid.js"></script>
     <script src="/libs/OrbitControls.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+
+    <script src="/js/Net.js"></script>
     <script src="/js/Ball.js"></script>
     <script src="/js/Cannon.js"></script>
     <script src="/js/Main.js"></script>
 
     <script>
         let chocola
+        let net
         $(document).ready(() => {
+            net = new Net()
             chocola = new Main()
         })
     </script>
