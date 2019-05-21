@@ -22,7 +22,11 @@ class Net {
         })
 
         this.client.on('shot', function () {
-            console.log('another shot')
+            console.log('net shot')
+        })
+
+        this.client.on('reload', function () {
+            console.log('net reload')
         })
 
         this.client.on('BTFO', function () {

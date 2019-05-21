@@ -152,4 +152,9 @@ io.sockets.on('connection', function (client) {
         console.log(client.id + ': shot')
         client.broadcast.emit('shot')
     })
+
+    client.on('reload', function () {
+        console.log(client.id + ': reload')
+        client.broadcast.emit('reload')
+    })
 })
