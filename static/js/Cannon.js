@@ -19,7 +19,9 @@ class Cannon {
         let wheelGeo = new THREE.CylinderGeometry(20, 20, 10, 16)
         let wheelMat = new THREE.MeshBasicMaterial({
             color: color,
-            wireframe: false
+            wireframe: false,
+            opacity: 0.5,
+            transparent: true
         })
 
         let frameMat = new THREE.MeshBasicMaterial({
@@ -30,13 +32,16 @@ class Cannon {
         let barrelGeo = new THREE.CylinderGeometry(10, 10, 50, 16)
         let barrelMat = new THREE.MeshBasicMaterial({
             color: color,
-            wireframe: false
+            wireframe: false,
+            opacity: 0.5,
+            transparent: true
         })
 
         this.wheelLeft = new THREE.Mesh(wheelGeo, wheelMat)
         this.wheelRight = new THREE.Mesh(wheelGeo, wheelMat)
         this.barrel = new THREE.Mesh(barrelGeo, barrelMat)
         this.tip = new THREE.Object3D()
+        this.cam = new THREE.Object3D()
 
         let frameLeft = new THREE.Mesh(wheelGeo, frameMat)
         let frameRight = new THREE.Mesh(wheelGeo, frameMat)
@@ -51,8 +56,10 @@ class Cannon {
         barrelGeo.translate(0, 20, 0)
 
         this.tip.position.set(0, 45, 0)
+        this.cam.position.set(0, -150, 0)
 
         this.barrel.add(this.tip)
+        this.barrel.add(this.cam)
 
         this.wheelLeft.add(frameLeft)
         this.wheelRight.add(frameRight)
@@ -72,7 +79,7 @@ class Cannon {
     }
 
     setRotation(angle) {
-        this.cannonAngle = angle
+        this.cannonAngle = parseFloat(angle)
         let rad = angle * (Math.PI / 180)
         this.cont.rotation.set(0, rad, 0)
         this.wheelLeft.rotation.set(-rad, 0,  Math.PI / 2)

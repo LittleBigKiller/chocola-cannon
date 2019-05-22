@@ -10,6 +10,8 @@ class Main {
         this.othBalls = []
         this.othEmpty = true
 
+        this.camMode = 0 // 0 - behind cannon, 1 - following the ball, 2 - following the chunk
+
         var scene = new THREE.Scene()
         this.scene = scene
 
@@ -27,10 +29,10 @@ class Main {
         renderer.setSize(winWidth, winHeight)
 
 
-        var orbitControl = new THREE.OrbitControls(camera, renderer.domElement)
+        /* var orbitControl = new THREE.OrbitControls(camera, renderer.domElement)
         orbitControl.addEventListener('change', function () {
             renderer.render(scene, camera)
-        })
+        }) */
 
         $("#root").append(renderer.domElement)
 
@@ -115,6 +117,16 @@ class Main {
                 let newBallPos = new THREE.Vector3(x, y, z)
                 newBallPos.add(originPos)
 
+                if (this.camMode == 1) {
+                    this.scene.updateMatrixWorld()
+                    let newCamPos = new THREE.Vector3(0, 0, 0)
+                    ball.cam.getWorldPosition(newCamPos)
+                    this.camera.position.set(newCamPos.x, newCamPos.y, newCamPos.z)
+
+                    this.camera.lookAt(ball.ball.getWorldPosition(new THREE.Vector3(1, 1, 1)))
+                }
+
+
                 ball.ball.position.x = newBallPos.x
                 ball.ball.position.y = newBallPos.y
                 ball.ball.position.z = newBallPos.z
@@ -128,6 +140,8 @@ class Main {
                         setTimeout(() => {
                             this.balls.splice(this.balls.indexOf(ball), 1)
                             this.scene.remove(ball.cont)
+                            this.camMode = 0
+                            this.reloadCannon()
                         }, ball.lifetime)
                     }
                 }
@@ -181,6 +195,18 @@ class Main {
             let newBallPos = new THREE.Vector3(0, 0, 0)
             cannon.tip.getWorldPosition(newBallPos)
             balls[balls.length - 1].ball.position.set(newBallPos.x, newBallPos.y, newBallPos.z)
+            
+            balls[balls.length - 1].ball.rotation.x = 0
+            balls[balls.length - 1].ball.rotation.y = 0
+            balls[balls.length - 1].ball.rotation.z = 0
+        }
+
+        if (cannon == this.canObj && this.camMode == 0) {
+            this.scene.updateMatrixWorld()
+            let newCamPos = new THREE.Vector3(0, 0, 0)
+            cannon.cam.getWorldPosition(newCamPos)
+            this.camera.position.set(newCamPos.x, newCamPos.y, newCamPos.z)
+            this.camera.lookAt(cannon.barrel.getWorldPosition(new THREE.Vector3(1, 1, 1)))
         }
     }
 
@@ -226,16 +252,13 @@ class Main {
     }
 
     cannonFire() {
-        if (this.empty) {
-            this.reloadCannon()
-            $('#button-fire').html('FIRE!').removeClass('reload')
-
-            net.client.emit('reload')
-        } else {
+        if (!this.empty) {
             this.balls[this.balls.length - 1].shot(Date.now(), this.barrelAngle, this.canObj.cont.getWorldDirection(new THREE.Vector3(1, 1, 1)), this.shotPower, this.gravMulti, this.canObj.tip.getWorldPosition(new THREE.Vector3(1, 1, 1)), this.ballTime)
-            $('#button-fire').html('RELOAD!').addClass('reload')
+            $('#button-fire').html('WAIT!').addClass('reload')
             this.empty = true
             console.warn('-- TRIGGER FIRE EFFECT HERE --')
+
+            this.camMode = 1
 
             net.client.emit('shot', {
                 time: Date.now(),
@@ -264,11 +287,14 @@ class Main {
             if (!balls[i].isFlying) empty = false
         }
 
-        if (empty) {
+        if (empty && balls.length == 0) {
             let ballObj = new Ball()
             balls.push(ballObj)
             let ball = ballObj.cont
             this.scene.add(ball)
+
+            $('#button-fire').html('FIRE!').removeClass('reload')
+            net.client.emit('reload')
 
             this.prepareShot(cannon)
             if (cannon == this.canObj)

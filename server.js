@@ -59,6 +59,12 @@ function getResponse(req, res) {
             res.write(data)
             res.end()
         })
+    } else if (req.url == '/walltest') {
+        fs.readFile(__dirname + '/static/wall.html', function (error, data) {
+            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+            res.write(data)
+            res.end()
+        })
     } else {
         fs.readFile(__dirname + '/static/index.html', function (error, data) {
             res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
