@@ -150,7 +150,7 @@ class Main {
         this.wColumns = []
         this.bricks = []
 
-        let brickOffset = brickSize * width / 2
+        let brickOffset = brickSize * width / 2 - brickSize / 2
 
         for (let i = 0; i < width; i++) {
             let column = []
