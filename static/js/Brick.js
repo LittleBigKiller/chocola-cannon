@@ -18,6 +18,8 @@ class Brick {
         })
 
         this.brick = new THREE.Mesh(brickGeo, this.brickMat)
+        this.brick.name = "brick"
+        this.brick.class = this
 
         let frame = new THREE.Mesh(brickGeo, frameMat)
 
@@ -64,10 +66,11 @@ class Brick {
         else {
             if (!this.landTime)
                 this.landTime = Date.now()
-            setTimeout(() => { this.deleteMe = true; chocola.camMode = 0; chocola.reloadCannon(); chocola.prepareShot() }, 2000)
+            if (!this.deleteMe)
+                setTimeout(() => { this.deleteMe = true; chocola.camMode = 0; chocola.reloadCannon(); chocola.prepareShot() }, 1500)
         }
 
-        if (this.camMode = 3) {
+        if (chocola.camMode == 2) {
             chocola.scene.updateMatrixWorld()
             let newCamPos = new THREE.Vector3(0, 0, 0)
             this.cam.getWorldPosition(newCamPos)

@@ -49,7 +49,7 @@ class Main {
         let grid = new Grid(20000, 2000)
         scene.add(grid)
 
-        this.spawnWall(10, 10, 50)
+        this.spawnWall(9, 9, 50)
 
         let main = this
 
@@ -248,10 +248,8 @@ class Main {
 
                                         this.camMode = 2
                                         ball.marked = true
-                                        setTimeout(() => {
-                                            this.balls.splice(this.balls.indexOf(ball), 1)
-                                            this.scene.remove(ball.cont)
-                                        }, ball.lifetime)
+                                        this.balls.splice(this.balls.indexOf(ball), 1)
+                                        this.scene.remove(ball.cont)
                                     }
                                 }
                             }
@@ -268,9 +266,7 @@ class Main {
                         setTimeout(() => {
                             this.balls.splice(this.balls.indexOf(ball), 1)
                             this.scene.remove(ball.cont)
-                            if (this.camMode == 1) {
-                                this.camMode = 0
-                            }
+                            this.camMode = 0
                             this.reloadCannon()
                         }, ball.lifetime)
                     }
@@ -435,7 +431,7 @@ class Main {
 
             this.prepareShot(cannon)
             if (cannon == this.canObj)
-                this.empty = false
+                setTimeout(() => { this.empty = false }, 100)
             else
                 this.othEmpty = false
         }
