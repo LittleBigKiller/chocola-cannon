@@ -49,6 +49,8 @@ class Main {
         let grid = new Grid(20000, 2000)
         scene.add(grid)
 
+        this.spawnWall(10, 10, 50)
+
         let main = this
 
         $(window).resize(function () {
@@ -102,6 +104,7 @@ class Main {
 
         function render() {
             main.ballistics()
+            main.brickMovement()
             requestAnimationFrame(render)
 
             renderer.render(scene, camera)
@@ -110,6 +113,7 @@ class Main {
         render()
     }
 
+    //#region CANNON DISPLAY
     spawnCannons(slot) {
         this.canObj = new Cannon(slot)
         let cannon = this.canObj.cont
@@ -138,7 +142,65 @@ class Main {
             this.othBalls[i].cont.visible = boolean
         }
     }
+    //#endregion
 
+    //#region WALL
+    spawnWall(width, height, brickSize) {
+        this.wall = new THREE.Object3D()
+        this.wColumns = []
+        this.bricks = []
+
+        let brickOffset = brickSize * width / 2
+
+        for (let i = 0; i < width; i++) {
+            let column = []
+            for (let j = 0; j < height; j++) {
+                let b = new Brick(brickSize)
+                b.cont.position.x = i * brickSize - brickOffset
+                b.cont.position.y = j * brickSize
+                b.cont.position.z = 0
+                this.wall.add(b.cont)
+                column.push(b)
+                this.bricks.push(b)
+            }
+            this.wColumns.push(column)
+        }
+        this.wall.position.set(0, 0, 1000)
+        this.scene.add(this.wall)
+    }
+
+    spawnTestBrick(posX, posZ, size) {
+        this.testBrick = new Brick(size)
+        this.scene.add(this.testBrick.cont)
+        this.testBrick.cont.position.x = posX
+        this.testBrick.cont.position.z = posZ
+    }
+
+    brickMovement() {
+        let wc = this.wColumns
+        let b = this.bricks
+
+        for (let i in wc) {
+            for (let j in wc[i]) {
+                if (wc[i][j].cont.position.y > wc[i][j].size * j) {
+                    wc[i][j].fallDown()
+                }
+            }
+        }
+
+        for (let i in b) {
+            if (!b[i].nothit) {
+                b[i].handleHit()
+            }
+            if (b[i].deleteMe) {
+                this.wall.remove(b[i].cont)
+                b.splice(i, 1)
+            }
+        }
+    }
+    //#endregion
+
+    //#region BALL
     ballistics() {
         for (let i in this.balls) {
             let ball = this.balls[i]
@@ -158,6 +220,10 @@ class Main {
                 let newBallPos = new THREE.Vector3(x, y, z)
                 newBallPos.add(originPos)
 
+                ball.cont.position.x = newBallPos.x
+                ball.cont.position.y = newBallPos.y
+                ball.cont.position.z = newBallPos.z
+
                 if (this.camMode == 1) {
                     this.scene.updateMatrixWorld()
                     let newCamPos = new THREE.Vector3(0, 0, 0)
@@ -167,10 +233,31 @@ class Main {
                     this.camera.lookAt(ball.cont.getWorldPosition(new THREE.Vector3(1, 1, 1)))
                 }
 
+                let wc = this.wColumns
 
-                ball.cont.position.x = newBallPos.x
-                ball.cont.position.y = newBallPos.y
-                ball.cont.position.z = newBallPos.z
+                for (let i in wc) {
+                    for (let j in wc[i]) {
+                        let tb = wc[i][j]
+                        let tbPos = tb.cont.getWorldPosition(new THREE.Vector3(0, 0, 0))
+                        if ((newBallPos.x > tbPos.x - tb.size / 2) && (newBallPos.x < tbPos.x + tb.size / 2)) {
+                            if ((newBallPos.z > tbPos.z - tb.size / 2) && (newBallPos.z < tbPos.z + tb.size / 2)) {
+                                if ((newBallPos.y > tbPos.y) && (newBallPos.y < tbPos.y + tb.size)) {
+                                    if (tb.nothit) {
+                                        tb.gotHit()
+                                        wc[i].splice(wc[i].indexOf(tb), 1)
+
+                                        this.camMode = 2
+                                        ball.marked = true
+                                        setTimeout(() => {
+                                            this.balls.splice(this.balls.indexOf(ball), 1)
+                                            this.scene.remove(ball.cont)
+                                        }, ball.lifetime)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 if (ball.cont.position.y < 0) {
                     ball.cont.position.y = 0
@@ -181,7 +268,9 @@ class Main {
                         setTimeout(() => {
                             this.balls.splice(this.balls.indexOf(ball), 1)
                             this.scene.remove(ball.cont)
-                            this.camMode = 0
+                            if (this.camMode == 1) {
+                                this.camMode = 0
+                            }
                             this.reloadCannon()
                         }, ball.lifetime)
                     }
@@ -252,7 +341,9 @@ class Main {
             this.camera.lookAt(cannon.barrel.getWorldPosition(new THREE.Vector3(1, 1, 1)))
         }
     }
+    //#endregion
 
+    //#region CANNON WORKINGS
     cannonAngle(value, cannon = this.canObj) {
         this.barrelAngle = value
         cannon.setBarrelAngle(value)
@@ -349,4 +440,5 @@ class Main {
                 this.othEmpty = false
         }
     }
+    // #endregion
 }
