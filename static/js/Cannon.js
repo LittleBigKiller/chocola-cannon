@@ -70,11 +70,21 @@ class Cannon {
         this.cont.add(this.barrel)
         this.cont.position.set(position.x, position.y, position.z)
         this.cont.translateOnAxis(new THREE.Vector3(0, 1, 0), 20)
+
+        if (slot == 'cl0') {
+            this.barrel.name = "barrel"
+            this.barrel.highlight = () => {
+                barrelMat.color.setHex(0xFFFF00)
+            }
+            this.barrel.lowlight = () => {
+                barrelMat.color.setHex(color)
+            }
+        }
     }
 
     setBarrelAngle(angle) {
         this.barrelAngle = angle
-        let rad = angle * (Math.PI / 180)
+        let rad = Math.abs(angle - 90) * (Math.PI / 180)
         this.barrel.rotation.set(rad, 0, 0)
     }
 
@@ -82,7 +92,7 @@ class Cannon {
         this.cannonAngle = parseFloat(angle)
         let rad = angle * (Math.PI / 180)
         this.cont.rotation.set(0, rad, 0)
-        this.wheelLeft.rotation.set(-rad, 0,  Math.PI / 2)
+        this.wheelLeft.rotation.set(-rad, 0, Math.PI / 2)
         this.wheelRight.rotation.set(rad, 0, Math.PI / 2)
     }
 }

@@ -20,11 +20,11 @@ class Ball {
         let frame = new THREE.Mesh(ballGeo, frameMat)
 
         this.cam = new THREE.Object3D()
-        this.cam.position.set(0, 200, -200)
+        this.cam.position.set(0, 100, -200)
 
         this.ball.add(frame)
         this.cont.add(this.ball)
-        this.ball.add(this.cam)
+        this.cont.add(this.cam)
 
         this.isFlying = false
         this.marked = false

@@ -59,6 +59,65 @@ class Main {
             renderer.setSize(winWidth, winHeight)
         })
 
+        $('#root').on('mousedown', e => {
+            let raycaster = new THREE.Raycaster()
+            let mouseVector = new THREE.Vector2()
+
+            mouseVector.x = (e.clientX / $(window).width()) * 2 - 1
+            mouseVector.y = -(e.clientY / $(window).height()) * 2 + 1
+            raycaster.setFromCamera(mouseVector, camera)
+            let inter = raycaster.intersectObjects(this.canObj.cont.children, true)
+
+            if (inter.length > 0) {
+                if (inter[0].object.name == "barrel") {
+                    this.canObj.barrel.highlight()
+
+                    $('#root').on('mousemove', e => {
+                        let bAngle = parseInt(this.canObj.barrelAngle)
+                        let cAngle = parseInt(this.canObj.cannonAngle)
+
+                        if (e.clientY - $(window).height() / 2 > 20) {
+                            if (bAngle < 90)
+                                this.cannonAngle(bAngle += 1)
+                        }
+                        if (e.clientY - $(window).height() / 2 < -20) {
+                            if (bAngle > 0) {
+                                this.cannonAngle(bAngle -= 1)
+                            }
+                        }
+                        if (e.clientX - $(window).width() / 2 > 20) {
+                            this.cannonRotate(cAngle -= 1)
+                        }
+                        if (e.clientX - $(window).width() / 2 < -20) {
+                            this.cannonRotate(cAngle += 1)
+                        }
+                    })
+
+                    /* if (e.type == 'mousedown')
+                        moveAnimDone = false
+
+                    targetVec = inter[0].point
+                    targetVec.y = 0
+                    dirVec = targetVec.clone().sub(player.getCont().position).normalize()
+
+                    marker.getCont().position.x = targetVec.x
+                    marker.getCont().position.y = targetVec.y
+                    marker.getCont().position.z = targetVec.z
+
+                    angle = Math.atan2(
+                        player.getCont().position.clone().x - targetVec.x,
+                        player.getCont().position.clone().z - targetVec.z
+                    )
+
+                    player.getMesh().rotation.y = angle + Math.PI */
+                }
+            }
+        })
+        $('#root').on('mouseup', e => {
+            $('#root').off('mousemove')
+            this.canObj.barrel.lowlight()
+        })
+
         function render() {
             main.ballistics()
             requestAnimationFrame(render)
@@ -123,16 +182,16 @@ class Main {
                     ball.cam.getWorldPosition(newCamPos)
                     this.camera.position.set(newCamPos.x, newCamPos.y, newCamPos.z)
 
-                    this.camera.lookAt(ball.ball.getWorldPosition(new THREE.Vector3(1, 1, 1)))
+                    this.camera.lookAt(ball.cont.getWorldPosition(new THREE.Vector3(1, 1, 1)))
                 }
 
 
-                ball.ball.position.x = newBallPos.x
-                ball.ball.position.y = newBallPos.y
-                ball.ball.position.z = newBallPos.z
+                ball.cont.position.x = newBallPos.x
+                ball.cont.position.y = newBallPos.y
+                ball.cont.position.z = newBallPos.z
 
-                if (ball.ball.position.y < 0) {
-                    ball.ball.position.y = 0
+                if (ball.cont.position.y < 0) {
+                    ball.cont.position.y = 0
 
                     if (!ball.marked) {
                         ball.marked = true
@@ -166,12 +225,12 @@ class Main {
                 let newBallPos = new THREE.Vector3(x, y, z)
                 newBallPos.add(originPos)
 
-                ball.ball.position.x = newBallPos.x
-                ball.ball.position.y = newBallPos.y
-                ball.ball.position.z = newBallPos.z
+                ball.cont.position.x = newBallPos.x
+                ball.cont.position.y = newBallPos.y
+                ball.cont.position.z = newBallPos.z
 
-                if (ball.ball.position.y < 0) {
-                    ball.ball.position.y = 0
+                if (ball.cont.position.y < 0) {
+                    ball.cont.position.y = 0
 
                     if (!ball.marked) {
                         ball.marked = true
@@ -194,11 +253,11 @@ class Main {
             this.scene.updateMatrixWorld()
             let newBallPos = new THREE.Vector3(0, 0, 0)
             cannon.tip.getWorldPosition(newBallPos)
-            balls[balls.length - 1].ball.position.set(newBallPos.x, newBallPos.y, newBallPos.z)
-            
-            balls[balls.length - 1].ball.rotation.x = 0
-            balls[balls.length - 1].ball.rotation.y = 0
-            balls[balls.length - 1].ball.rotation.z = 0
+            balls[balls.length - 1].cont.position.set(newBallPos.x, newBallPos.y, newBallPos.z)
+
+            balls[balls.length - 1].cont.rotation.x = 0
+            balls[balls.length - 1].cont.rotation.y = 0
+            balls[balls.length - 1].cont.rotation.z = 0
         }
 
         if (cannon == this.canObj && this.camMode == 0) {
@@ -212,7 +271,7 @@ class Main {
 
     cannonAngle(value, cannon = this.canObj) {
         this.barrelAngle = value
-        cannon.setBarrelAngle(Math.abs(value - 90))
+        cannon.setBarrelAngle(value)
 
         this.prepareShot(cannon)
 
@@ -223,6 +282,9 @@ class Main {
     }
 
     cannonRotate(value, cannon = this.canObj) {
+        if (value < 0) value += 360
+        if (value > 360) value -= 360
+
         cannon.setRotation(value)
 
         this.prepareShot(cannon)
