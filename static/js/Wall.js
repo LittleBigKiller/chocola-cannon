@@ -27,8 +27,8 @@ class Wall {
 
         $("#root").append(renderer.domElement)
 
-        this.camera.position.set(0, 500, -500)
-        camera.lookAt(new THREE.Vector3(0, 250, 0))
+        this.camera.position.set(0, 150, -400)
+        camera.lookAt(new THREE.Vector3(0, 150, 0))
 
         let tempLight = new THREE.PointLight(0xffffff, 1, 100)
         tempLight.position.set(50, 50, 50)
@@ -37,7 +37,7 @@ class Wall {
         let grid = new Grid(20000, 2000)
         scene.add(grid)
 
-        this.spawnWall(9, 9, 50)
+        this.spawnWall(6, 6, 50)
 
         let main = this
 
@@ -66,10 +66,12 @@ class Wall {
 
                     if (tb.nothit) {
                         tb.gotHit()
-                        for (let i in wc)
-                            wc[i].splice(wc[i].indexOf(tb), 1)
 
-                        this.camMode = 2
+                        for (let i in wc) {
+                            let index = wc[i].indexOf(tb)
+                            if (index != -1)
+                                wc[i].splice(index, 1)
+                        }
                     }
                 }
             }
@@ -131,7 +133,7 @@ class Wall {
             }
             if (b[i].deleteMe) {
                 this.wall.remove(b[i].cont)
-                b.splice(i, 1)
+                b.splice(b.indexOf(b[i]), 1)
             }
         }
     }
@@ -139,13 +141,8 @@ class Wall {
 
 
     reloadCannon() {
-        console.log('PLACEHOLDER #1')
     }
 
     prepareShot() {
-        console.log('PLACEHOLDER #2')
-
-        this.camera.position.set(0, 500, -500)
-        this.camera.lookAt(new THREE.Vector3(0, 250, 0))
     }
 }

@@ -194,7 +194,7 @@ class Main {
             }
             if (b[i].deleteMe) {
                 this.wall.remove(b[i].cont)
-                b.splice(i, 1)
+                b.splice(b.indexOf(b[i]), 1)
             }
         }
     }

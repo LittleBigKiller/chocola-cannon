@@ -43,12 +43,13 @@ class Brick {
     handleHit() {
         let c = this.cont
         let b = this.brick
+        let bClass = this
 
         let fallTime = (Date.now() - this.hitTime) / 500
 
         let timeSince
         if (this.landTime)
-            timeSince = (Date.now() - this.landTime) / 100
+            timeSince = (Date.now() - this.landTime) / 80
         else
             timeSince = 0
         let positionDiff = 10 - timeSince
@@ -66,8 +67,8 @@ class Brick {
         else {
             if (!this.landTime)
                 this.landTime = Date.now()
-            if (!this.deleteMe)
-                setTimeout(() => { this.deleteMe = true; chocola.camMode = 0; chocola.reloadCannon(); chocola.prepareShot() }, 1500)
+            if (this.deleteTimer == null)
+                this.deleteTimer = setTimeout(() => { bClass.deleteMe = true; chocola.camMode = 0; chocola.reloadCannon(); chocola.prepareShot() }, 1500)
         }
 
         if (chocola.camMode == 2) {
