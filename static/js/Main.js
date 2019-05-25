@@ -92,24 +92,6 @@ class Main {
                             this.cannonRotate(cAngle += 1)
                         }
                     })
-
-                    /* if (e.type == 'mousedown')
-                        moveAnimDone = false
-
-                    targetVec = inter[0].point
-                    targetVec.y = 0
-                    dirVec = targetVec.clone().sub(player.getCont().position).normalize()
-
-                    marker.getCont().position.x = targetVec.x
-                    marker.getCont().position.y = targetVec.y
-                    marker.getCont().position.z = targetVec.z
-
-                    angle = Math.atan2(
-                        player.getCont().position.clone().x - targetVec.x,
-                        player.getCont().position.clone().z - targetVec.z
-                    )
-
-                    player.getMesh().rotation.y = angle + Math.PI */
                 }
             }
         })
@@ -261,6 +243,8 @@ class Main {
         }
 
         if (cannon == this.canObj && this.camMode == 0) {
+            this.balls[this.balls.length - 1].setRotation(cannon.cannonAngle)
+
             this.scene.updateMatrixWorld()
             let newCamPos = new THREE.Vector3(0, 0, 0)
             cannon.cam.getWorldPosition(newCamPos)

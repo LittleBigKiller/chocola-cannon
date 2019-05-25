@@ -3,7 +3,7 @@ console.log('Ball loaded')
 class Ball {
     constructor() {
         this.cont = new THREE.Object3D()
-        
+
         let ballGeo = new THREE.SphereGeometry(8, 8, 4)
         let ballMat = new THREE.MeshBasicMaterial({
             color: 0x2F2F2F,
@@ -40,5 +40,10 @@ class Ball {
         this.lifetime = lifetime
 
         this.isFlying = true
+    }
+
+    setRotation(angle) {
+        let rad = angle * (Math.PI / 180)
+        this.cont.rotation.set(0, rad, 0)
     }
 }
