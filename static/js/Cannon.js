@@ -71,14 +71,12 @@ class Cannon {
         this.cont.position.set(position.x, position.y, position.z)
         this.cont.translateOnAxis(new THREE.Vector3(0, 1, 0), 20)
 
-        if (slot == 'cl0') {
-            this.barrel.name = "barrel"
-            this.barrel.highlight = () => {
-                barrelMat.color.setHex(0xFFFF00)
-            }
-            this.barrel.lowlight = () => {
-                barrelMat.color.setHex(color)
-            }
+        this.barrel.name = "barrel"
+        this.barrel.highlight = () => {
+            barrelMat.color.setHex(0xFFFF00)
+        }
+        this.barrel.lowlight = () => {
+            barrelMat.color.setHex(color)
         }
     }
 
