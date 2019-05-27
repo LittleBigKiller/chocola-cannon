@@ -50,6 +50,16 @@ class Net {
             chocola.reloadCannon(chocola.othCan)
         })
 
+        this.client.on('despawnBall', function () {
+            console.log('net despawnBall')
+            chocola.despawnBall()
+        })
+
+        this.client.on('brickHit', function (data) {
+            console.log('net brickHit')
+            chocola.remoteHit(data.cIndex, data.bIndex)
+        })
+
         this.client.on('BTFO', function () {
             console.log('BTFO\'d')
             window.alert('GAME FULL\n\nTry again later')

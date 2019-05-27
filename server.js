@@ -185,4 +185,17 @@ io.sockets.on('connection', function (client) {
         console.log(client.id + ': reload')
         client.broadcast.emit('reload')
     })
+
+    client.on('despawnBall', function () {
+        console.log(client.id + ': despawnBall')
+        client.broadcast.emit('despawnBall')
+    })
+
+    client.on('brickHit', function (data) {
+        console.log(client.id + ': brickHit')
+        client.broadcast.emit('brickHit', {
+            cIndex: data.cIndex,
+            bIndex: data.bIndex
+        })
+    })
 })

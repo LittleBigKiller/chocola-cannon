@@ -198,6 +198,11 @@ class Main {
             }
         }
     }
+
+    remoteHit(cIndex, bIndex) {
+        this.wColumns[cIndex][bIndex].gotHit()
+        this.wColumns[cIndex].splice(bIndex, 1)
+    }
     //#endregion
 
     //#region BALL
@@ -244,12 +249,17 @@ class Main {
                                 if ((newBallPos.y > tbPos.y) && (newBallPos.y < tbPos.y + tb.size)) {
                                     if (tb.nothit) {
                                         tb.gotHit()
+                                        net.client.emit('brickHit', {
+                                            cIndex: i,
+                                            bIndex: wc[i].indexOf(tb)
+                                        })
                                         wc[i].splice(wc[i].indexOf(tb), 1)
 
                                         this.camMode = 2
                                         ball.marked = true
                                         this.balls.splice(this.balls.indexOf(ball), 1)
                                         this.scene.remove(ball.cont)
+                                        net.client.emit('despawnBall')
                                     }
                                 }
                             }
@@ -310,6 +320,11 @@ class Main {
                 }
             }
         }
+    }
+
+    despawnBall() {
+        this.scene.remove(this.othBalls[this.othBalls.length - 1].cont)
+        this.othBalls.pop()
     }
 
     prepareShot(cannon = this.canObj) {
